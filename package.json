@@ -1,0 +1,25 @@
+{
+  "name": "@vinka/hapi-utils",
+  "version": "1.0.0",
+  "description": "Hapi utils",
+  "main": "index.js",
+  "scripts": {
+    "test": "lab -v -P test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinka-labs/hapi-utils.git"
+  },
+  "author": "Vinka",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vinka-labs/hapi-utils/issues"
+  },
+  "homepage": "https://github.com/vinka-labs/hapi-utils#readme",
+  "devDependencies": {
+    "bluebird": "^3.5.0",
+    "code": "^4.1.0",
+    "hapi": "^16.5.2",
+    "lab": "^14.1.1"
+  }
+}
