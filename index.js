@@ -104,8 +104,8 @@ exports.setupLogs = function (server, logger) {
         return;
     }
 
-    server.on('log', function (event, tags) {
-        logger.info(`${event.data} - [${(tags || []).join(',')}]`);
+    server.on('log', function (event) {
+        logger.info(`${event.data}`);
     });
     server.on('request-error', function (request, err) {
         logger.error(`${generateRequestLogLine(request)} ${err.message}`);
