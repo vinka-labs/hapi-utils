@@ -117,7 +117,9 @@ exports.setupLogs = function (server, logger) {
                 logger.error(generateRequestLogLine(request));
             }
         } else {
-            logger.info(generateRequestLogLine(request));
+            if (request.path !== '/version' && request.path !== '/health' && request.path !== '/metrics') {
+                logger.info(generateRequestLogLine(request));
+            }
         }
     });
 
