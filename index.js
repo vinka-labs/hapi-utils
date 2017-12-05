@@ -86,7 +86,7 @@ class PromisedHapi {
  *     with `info()` and `error()` functions.
  * @returns {hapi.Server} Hapi server instance.
  */
-exports.setupLogs = function (server, logger) {
+exports.setupLogs = function (server, logger, customFormatters) {
 
     function generateRequestLogLine(request) {
         let statusCode = '---';
@@ -97,7 +97,7 @@ exports.setupLogs = function (server, logger) {
 
         const qs = require('querystring');
         return `< ${request.method.toUpperCase()} ${request.path} ${statusCode}` +
-            ` ?${qs.unescape(qs.stringify(request.query))}`;
+               ` ?${qs.unescape(qs.stringify(request.query))}`;
     }
 
     if (!logger) {
@@ -117,7 +117,17 @@ exports.setupLogs = function (server, logger) {
                 logger.error(generateRequestLogLine(request));
             }
         } else {
-            if (request.path !== '/version' && request.path !== '/health' && request.path !== '/metrics') {
+            const frmt = customFormatters[request.path];
+            let msg;
+            if (frmt) {
+                msg = frmt(request);
+                if (typeof msg === 'undefined') {
+                    msg = generateRequestLogLine(request);
+                }
+            } else {
+                msg = generateRequestLogLine(request);
+            }
+            if (msg !== null) {
                 logger.info(generateRequestLogLine(request));
             }
         }
