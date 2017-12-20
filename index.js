@@ -5,6 +5,7 @@
 
 'use strict';
 
+const qs = require('querystring');
 let P = Promise;
 
 /**
@@ -86,7 +87,7 @@ class PromisedHapi {
  *     with `info()` and `error()` functions.
  * @returns {hapi.Server} Hapi server instance.
  */
-exports.setupLogs = function (server, logger, customFormatters) {
+exports.setupLogs = function (server, logger, customFormatters={}) {
 
     function generateRequestLogLine(request) {
         let statusCode = '---';
@@ -95,9 +96,9 @@ exports.setupLogs = function (server, logger, customFormatters) {
             statusCode = request.response.statusCode;
         }
 
-        const qs = require('querystring');
-        return `< ${request.method.toUpperCase()} ${request.path} ${statusCode}` +
-               ` ?${qs.unescape(qs.stringify(request.query))}`;
+        const qssz = qs.unescape(qs.stringify(request.query));
+        return `< ${request.method.toUpperCase()} ${request.path}` +
+               `${qssz ? ('?' + qssz) : ''} ${statusCode}`;
     }
 
     if (!logger) {
@@ -111,25 +112,26 @@ exports.setupLogs = function (server, logger, customFormatters) {
         logger.error(`${generateRequestLogLine(request)} ${err.message}`);
     });
     server.on('response', function (request) {
-        if (!request.response || request.response.statusCode >= 400) {
-            if (request.response.statusCode !== 500) {
-                // 500 errors are logged by `request-error` event handler
+        try {
+            if (!request.response || request.response.statusCode >= 400) {
                 logger.error(generateRequestLogLine(request));
-            }
-        } else {
-            const frmt = customFormatters[request.path];
-            let msg;
-            if (frmt) {
-                msg = frmt(request);
-                if (typeof msg === 'undefined') {
+            } else {
+                const frmt = customFormatters[request.path];
+                let msg;
+                if (frmt) {
+                    msg = frmt(request);
+                    if (typeof msg === 'undefined') {
+                        msg = generateRequestLogLine(request);
+                    }
+                } else {
                     msg = generateRequestLogLine(request);
                 }
-            } else {
-                msg = generateRequestLogLine(request);
+                if (msg !== null) {
+                    logger.info(msg);
+                }
             }
-            if (msg !== null) {
-                logger.info(generateRequestLogLine(request));
-            }
+        } catch (e) {
+            logger.error('unable to produce log line for API request', e.message);
         }
     });
 
