@@ -70,7 +70,7 @@ class PromisedHapi {
      */
     inject(options) {
         return new P(resolve => {
-            this.hapi.inject(options, resolve);
+            this.hapi.connections[0].inject(options, resolve);
         });
     }
 
