@@ -1,6 +1,6 @@
 {
   "name": "@vinka/hapi-utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Hapi utils",
   "main": "index.js",
   "scripts": {
